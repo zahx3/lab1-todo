@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Менеджер завдань</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="app-header">
+        <h1>Менеджер завдань</h1>
+        <nav class="stats" aria-label="Лічильники">
+            <span>Активні: <b id="active-count">0</b></span>
+            <span>Виконані: <b id="done-count">0</b></span>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="add-form-section" aria-label="Нове завдання">
+            <form id="task-form" novalidate>
+                <div class="field grow">
+                    <input type="text" id="task-input" placeholder="Що треба зробити?" autocomplete="off">
+                    <small class="error-text" id="task-error"></small>
+                </div>
+                <div class="field">
+                    <input type="date" id="date-input">
+                    <small class="error-text" id="date-error"></small>
+                </div>
+                <div class="field">
+                    <select id="priority-input">
+                        <option value="Низький">Низький</option>
+                        <option value="Звичайний" selected>Звичайний</option>
+                        <option value="Терміновий">Терміновий</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn primary">Додати</button>
+            </form>
+        </section>
+
+        <section class="toolbar" aria-label="Пошук і фільтр">
+            <input type="search" id="search-input" placeholder="Пошук за описом...">
+            <select id="filter-select">
+                <option value="all">Усі</option>
+                <option value="active">Активні</option>
+                <option value="done">Виконані</option>
+            </select>
+        </section>
+
+        <section class="entity-list-section" aria-label="Список завдань">
+            <ul id="task-list"></ul>
+            <p id="empty-msg" class="empty" hidden>Завдань немає. Додайте перше у формі вище.</p>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; 2026 · Лабораторна робота № 1 · Варіант 2</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

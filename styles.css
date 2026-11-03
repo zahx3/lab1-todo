@@ -1,0 +1,245 @@
+﻿:root {
+    --bg: #f1f3f6;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #7b8794;
+    --line: #d9dee5;
+    --accent: #2f6fed;
+    --danger: #d64545;
+    --urgent: #e8590c;
+    --ok: #2b9348;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, Arial, sans-serif;
+}
+
+.app-header, .container, .app-footer {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.app-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+    .app-header h1 {
+        margin: 0;
+        font-size: 1.6rem;
+    }
+
+.stats {
+    display: flex;
+    gap: 14px;
+    color: var(--muted);
+}
+
+    .stats b {
+        color: var(--text);
+    }
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+section {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 14px;
+    border: 1px solid var(--line);
+}
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 130px;
+}
+
+    .field.grow {
+        flex: 1 1 220px;
+    }
+
+input, select, button {
+    font: inherit;
+}
+
+input, select {
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    min-width: 0;
+}
+
+    input:focus-visible, select:focus-visible, button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+    }
+
+    input.invalid {
+        border-color: var(--danger);
+        background: #fff5f5;
+    }
+
+.error-text {
+    color: var(--danger);
+    font-size: .8rem;
+    min-height: 1em;
+}
+
+.btn {
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+}
+
+    .btn.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+    }
+
+    .btn.danger {
+        color: var(--danger);
+        border-color: var(--danger);
+    }
+
+    .btn.small {
+        padding: 4px 9px;
+        font-size: .85rem;
+    }
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+    .toolbar input {
+        flex: 1 1 200px;
+    }
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.task {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--muted);
+    border-radius: 6px;
+    background: #fff;
+    cursor: grab;
+}
+
+    .task.urgent {
+        border-left-color: var(--urgent);
+    }
+
+.task-text {
+    flex: 1 1 200px;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+
+.task-meta {
+    display: block;
+    font-size: .8rem;
+    color: var(--muted);
+}
+
+.task-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.task.done {
+    border-left-color: var(--ok);
+}
+
+    .task.done .task-text {
+        text-decoration: line-through;
+        color: var(--muted);
+    }
+
+.task.expired .task-meta {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.task.dragging {
+    opacity: .4;
+}
+
+.task.drag-over {
+    border-top: 3px solid var(--accent);
+}
+
+.edit-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+    .edit-row .field {
+        flex: 1 1 120px;
+    }
+
+.empty {
+    color: var(--muted);
+    text-align: center;
+    margin: 8px 0 0;
+}
+
+.app-footer {
+    color: var(--muted);
+    font-size: .85rem;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .task-actions {
+        width: 100%;
+    }
+}
