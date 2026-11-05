@@ -17,7 +17,11 @@ class Task {
 class TaskManager {
     constructor() {
         // відновлення з localStorage
-        this.tasks = JSON.parse(localStorage.getItem("my_tasks")) || [];
+        try {
+            this.tasks = JSON.parse(localStorage.getItem("my_tasks")) || [];
+        } catch (error) {
+            this.tasks = []; // якщо дані пошкоджені - починаємо з порожнього списку
+        }
     }
 
     save() {
@@ -86,7 +90,17 @@ const searchInput = document.getElementById("search-input");
 const filterSelect = document.getElementById("filter-select");
 
 // мінімальна дата - сьогодні
-dateInput.min = new Date().toISOString().slice(0, 10);
+const now = new Date();
+const today = now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(now.getDate()).padStart(2, "0");
+dateInput.min = today;
+
+// 2026-11-05 -> 05.11.2026
+function formatDate(iso) {
+    const [year, month, day] = iso.split("-");
+    return day + "." + month + "." + year;
+}
 
 // ===== Валідація =====
 function validateText(value) {
@@ -95,6 +109,14 @@ function validateText(value) {
 
 function validateDate(value) {
     if (!dateRegex.test(value)) return "Введіть дату у форматі РРРР-ММ-ДД";
+
+    // перевірка, що така дата існує (наприклад, 31 лютого - ні)
+    const [year, month, day] = value.split("-").map(Number);
+    const check = new Date(year, month - 1, day);
+    if (check.getMonth() !== month - 1 || check.getDate() !== day) {
+        return "Такої дати не існує";
+    }
+
     if (value < dateInput.min) return "Дата не може бути в минулому";
     return "";
 }
@@ -171,9 +193,15 @@ function render() {
         if (task.done) li.classList.add("done");
         if (task.priority === "Терміновий") li.classList.add("urgent");
 
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        check.className = "done-check";
+        check.checked = task.done;
+        check.title = "Позначити виконаним";
+
         const text = document.createElement("span");
         text.className = "task-text";
-        text.textContent = task.text + " (до " + task.date + ", " + task.priority + ")";
+        text.textContent = task.text + " (до " + formatDate(task.date) + ", " + task.priority + ")";
 
         const editBtn = document.createElement("button");
         editBtn.className = "btn small edit-btn";
@@ -187,7 +215,7 @@ function render() {
         actions.className = "task-actions";
         actions.append(editBtn, delBtn);
 
-        li.append(text, actions);
+        li.append(check, text, actions);
         list.append(li);
     });
 
@@ -234,6 +262,7 @@ list.addEventListener("click", event => {
     if (event.target.closest(".edit-row") && !event.target.closest("button")) return;
 
     if (event.target.closest(".delete-btn")) {
+        if (!confirm("Видалити це завдання?")) return;
         manager.remove(id);
     } else if (event.target.closest(".edit-btn")) {
         editingId = id;
@@ -254,7 +283,7 @@ list.addEventListener("click", event => {
         }
         manager.edit(id, textField.value.trim(), dateField.value, prioritySelect.value);
         editingId = null;
-    } else if (id !== editingId) {
+    } else if (id !== editingId && event.target.closest(".done-check, .task-text")) {
         manager.toggle(id);
     }
     render();
@@ -277,6 +306,9 @@ list.addEventListener("dragstart", event => {
 
 list.addEventListener("dragover", event => {
     event.preventDefault(); // без цього drop не спрацює
+    list.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+    const li = event.target.closest(".task");
+    if (li) li.classList.add("drag-over");
 });
 
 list.addEventListener("drop", event => {

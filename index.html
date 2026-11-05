@@ -19,11 +19,11 @@
         <section class="add-form-section" aria-label="Нове завдання">
             <form id="task-form" novalidate>
                 <div class="field grow">
-                    <input type="text" id="task-input" placeholder="Що треба зробити?" autocomplete="off">
+                    <input type="text" id="task-input" placeholder="Що треба зробити?" autocomplete="off" required maxlength="100">
                     <small class="error-text" id="task-error"></small>
                 </div>
                 <div class="field">
-                    <input type="date" id="date-input">
+                    <input type="date" id="date-input" required>
                     <small class="error-text" id="date-error"></small>
                 </div>
                 <div class="field">

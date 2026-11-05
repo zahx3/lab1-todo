@@ -251,3 +251,9 @@ ul {
 .edit-row input[type="text"] {
     flex: 1 1 180px;
 }
+
+.done-check {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
