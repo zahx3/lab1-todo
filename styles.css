@@ -243,3 +243,11 @@ ul {
         width: 100%;
     }
 }
+
+.edit-error {
+    width: 100%;
+}
+
+.edit-row input[type="text"] {
+    flex: 1 1 180px;
+}

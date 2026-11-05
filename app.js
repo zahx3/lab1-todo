@@ -40,10 +40,11 @@ class TaskManager {
         this.save();
     }
 
-    edit(id, text, date) {
+    edit(id, text, date, priority) {
         const task = this.tasks.find(t => t.id === id);
         task.text = text;
         task.date = date;
+        task.priority = priority;
         this.save();
     }
 
@@ -72,6 +73,7 @@ class TaskManager {
 // ===== Елементи сторінки =====
 const manager = new TaskManager();
 let dragId = null;
+let editingId = null; // id завдання, яке зараз редагується
 
 const form = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
@@ -106,6 +108,48 @@ function showError(input, errorEl, message) {
     }
 }
 
+// ===== Форма редагування прямо в рядку завдання =====
+function createEditForm(task) {
+    const row = document.createElement("div");
+    row.className = "edit-row";
+
+    const textField = document.createElement("input");
+    textField.type = "text";
+    textField.value = task.text;
+    textField.className = "edit-text";
+
+    const dateField = document.createElement("input");
+    dateField.type = "date";
+    dateField.value = task.date;
+    dateField.min = dateInput.min;
+    dateField.className = "edit-date";
+
+    // вибір пріоритету: ті самі значення, що й у формі додавання
+    const prioritySelect = document.createElement("select");
+    prioritySelect.className = "edit-priority";
+    ["Низький", "Звичайний", "Терміновий"].forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        option.selected = name === task.priority;
+        prioritySelect.append(option);
+    });
+
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "btn small primary save-btn";
+    saveBtn.textContent = "Зберегти";
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "btn small cancel-btn";
+    cancelBtn.textContent = "Скасувати";
+
+    const error = document.createElement("small");
+    error.className = "error-text edit-error";
+
+    row.append(textField, dateField, prioritySelect, saveBtn, cancelBtn, error);
+    return row;
+}
+
 // ===== Відображення списку =====
 function render() {
     const tasks = manager.filter(filterSelect.value, searchInput.value);
@@ -115,6 +159,14 @@ function render() {
         const li = document.createElement("li");
         li.className = "task";
         li.dataset.id = task.id;
+
+        // режим редагування: замість тексту показуємо поля
+        if (task.id === editingId) {
+            li.append(createEditForm(task));
+            list.append(li);
+            return;
+        }
+
         li.draggable = true;
         if (task.done) li.classList.add("done");
         if (task.priority === "Терміновий") li.classList.add("urgent");
@@ -178,24 +230,42 @@ list.addEventListener("click", event => {
     if (!li) return;
     const id = li.dataset.id;
 
+    // клік по полях редагування (input, select) не повинен перемальовувати список
+    if (event.target.closest(".edit-row") && !event.target.closest("button")) return;
+
     if (event.target.closest(".delete-btn")) {
         manager.remove(id);
     } else if (event.target.closest(".edit-btn")) {
-        const task = manager.tasks.find(t => t.id === id);
-        const newText = prompt("Новий опис:", task.text);
-        if (newText === null) return;
-        const newDate = prompt("Новий дедлайн (РРРР-ММ-ДД):", task.date);
-        if (newDate === null) return;
-        const error = validateText(newText) || validateDate(newDate);
-        if (error) {
-            alert(error);
-            return;
+        editingId = id;
+    } else if (event.target.closest(".cancel-btn")) {
+        editingId = null;
+    } else if (event.target.closest(".save-btn")) {
+        const textField = li.querySelector(".edit-text");
+        const dateField = li.querySelector(".edit-date");
+        const prioritySelect = li.querySelector(".edit-priority");
+        const errorEl = li.querySelector(".edit-error");
+        const textMsg = validateText(textField.value);
+        const dateMsg = validateDate(dateField.value);
+        if (textMsg || dateMsg) {
+            errorEl.textContent = textMsg || dateMsg;
+            textField.classList.toggle("invalid", textMsg !== "");
+            dateField.classList.toggle("invalid", dateMsg !== "");
+            return; // залишаємось у режимі редагування
         }
-        manager.edit(id, newText.trim(), newDate);
-    } else {
+        manager.edit(id, textField.value.trim(), dateField.value, prioritySelect.value);
+        editingId = null;
+    } else if (id !== editingId) {
         manager.toggle(id);
     }
     render();
+});
+
+// keydown - Enter зберігає, Escape скасовує редагування
+list.addEventListener("keydown", event => {
+    const li = event.target.closest(".task");
+    if (!li || !event.target.closest(".edit-row")) return;
+    if (event.key === "Enter") li.querySelector(".save-btn").click();
+    if (event.key === "Escape") li.querySelector(".cancel-btn").click();
 });
 
 // Drag and Drop - теж через делегування
